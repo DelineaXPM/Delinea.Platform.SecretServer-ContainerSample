@@ -8,7 +8,6 @@ import json
 import urllib.parse
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import logging
-import re
 
 logger = logging.getLogger(__name__)
 
