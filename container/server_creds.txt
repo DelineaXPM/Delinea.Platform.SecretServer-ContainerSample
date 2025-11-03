@@ -1,0 +1,3 @@
+SERVER_URL=<platform/secretserver-url>
+SERVER_USERNAME=<platform/secretserver-username>
+SERVER_PASSWORD=<platform/secretserver-password>

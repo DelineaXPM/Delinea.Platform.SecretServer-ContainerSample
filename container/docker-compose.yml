@@ -1,0 +1,76 @@
+services:
+  # Delinea Sidecar: fetches secrets and exposes them via HTTP API
+  sidecar:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      # Secrets Configuration (JSON format with field filtering)
+      # Replace with your actual secret IDs from Delinea PLatform/Secret-Server
+      # Note: You can give custom names to secrets for easier reference
+      # Note: Field filtering is supported using comma-separated slug-field names or '*' for all fields
+      SECRETS_CONFIG: |
+        [
+          {
+            "id": "0001",
+            "name": "secret-1",
+            "fields": "username,password,hostname,port"
+          },
+          {
+            "id": "0002",
+            "name": "secret-2",
+            "fields": "database,username,password"
+          }
+        ]
+
+      # Storage Configuration
+      POLL_INTERVAL: "60"
+      HTTP_PORT: "8080"
+      BIND_HOST: "0.0.0.0"
+
+    # Mount the Docker secret
+    # Docker secret for Delinea credentials
+    secrets:
+      - server_creds
+
+    # Internal-only network
+    networks:
+      - delinea_secure_network
+
+    # Healthcheck for sidecar API
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # NGINX HTTPS Proxy: TLS termination for sidecar API
+  nginx-proxy:
+    image: nginx:alpine
+    depends_on:
+      - sidecar
+    # Mount config and SSL certs
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    networks:
+      - delinea_secure_network
+    # Healthcheck for HTTPS proxy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "https://localhost:8443/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# =================================================================
+# Define Docker Secrets
+# =================================================================
+# Docker secret for sidecar credentials
+secrets:
+  server_creds:
+    file: ./server_creds.txt
+
+# Internal network for all services
+networks:
+  delinea_secure_network:
+    driver: bridge
