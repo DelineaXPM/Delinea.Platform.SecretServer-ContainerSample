@@ -11,7 +11,9 @@ curl -sS http://127.0.0.1:8080/health
 # list secrets
 curl -sS http://127.0.0.1:8080/secrets
 # fetch a secret (example name)
-curl -sS http://127.0.0.1:8080/secrets/mongo-secret
+curl -sS http://127.0.0.1:8080/secrets/secret-name
+# fetch a secret (example ID)
+curl -sS http://127.0.0.1:8080/secrets/12345
 
 ```
 Via the nginx-proxy — HTTPS (development certificate)

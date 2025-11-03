@@ -133,7 +133,9 @@ class DelineaSidecar:
                 filtered = self._filter_fields(raw_fields, sc["fields"])
                 filtered["_last_updated"] = datetime.now().isoformat()
                 filtered["_secret_name"] = sc["name"]
+                filtered["_secret_id"] = sc["id"]
                 updated_secrets[sc["name"]] = filtered
+                updated_secrets[sc["id"]] = filtered
         if updated_secrets:
             self.secrets_cache = updated_secrets
             self.last_update = datetime.now().isoformat()

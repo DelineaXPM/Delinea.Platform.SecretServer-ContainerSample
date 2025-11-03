@@ -36,10 +36,11 @@ let db;
 async function connectToDatabase() {
     try {
         console.log('🔄 Connecting to MongoDB...');
-        //(start)changes for sidecar secrets
-        // Fetch secrets from Delinea Sidecar
-        // 'mongo-secret' is the name of the secret stored in the sidecar
-        const secret = await getSecretFromDelineaSidecar('mongo-secret');
+
+    //(start)changes for sidecar secrets
+    const secret = await getSecretFromDelineaSidecar('11126');
+    // OR
+    // const secret = await getSecretFromDelineaSidecar('mongo-secret');
         console.log('🔐 Retrieved MongoDB secret from sidecar :', secret);
         if (secret.username) {
                 config.database.username = secret.username;

@@ -8,6 +8,7 @@ import json
 import urllib.parse
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +19,7 @@ class SidecarHTTPHandler(BaseHTTPRequestHandler):
       - GET /health -> health status, secret count, last update
       - GET /secrets -> list of configured secret names
       - GET /secrets/<name> -> secret fields (masked unless API_KEY provided)
+      - GET /secrets/<ID> -> secret fields by ID (masked unless API_KEY provided
     """
 
     def _send_json(self, data, status=200):
@@ -44,10 +46,21 @@ class SidecarHTTPHandler(BaseHTTPRequestHandler):
                     "last_update": sidecar.last_update
                 })
             elif path.startswith("/secrets/"):
-                name = path.split("/")[-1]
-                if name in sidecar.secrets_cache:
-                    data = sidecar.secrets_cache[name]
+                identifier = path.split("/")[-1]
+                # Try direct cache lookup first (works for both name and id keys)
+                data = sidecar.secrets_cache.get(identifier)
+                if data:
                     self._send_json(data)
+                    return
+                # Fallback: look for secret where _secret_id matches
+                found = None
+                for _, secret_data in sidecar.secrets_cache.items():
+                    if secret_data.get("_secret_id") == identifier:
+                        found = secret_data
+                        break
+
+                if found:
+                    self._send_json(found)
                 else:
                     self._send_json({"error": "Secret not found"}, 404)
             else:

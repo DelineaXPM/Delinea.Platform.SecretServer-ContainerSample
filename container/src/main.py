@@ -36,7 +36,7 @@ def main():
         server = SidecarHTTPServer((bind_host, port), SidecarHTTPHandler, sidecar)
 
         logger.info(f"🌐 HTTP API server running on {bind_host}:{port}")
-        logger.info("📋 Endpoints: /health, /secrets, /secrets/<name>")
+        logger.info("📋 Endpoints: /health, /secrets, /secrets/<name>, /secrets/<ID>")
         server.serve_forever()
 
     except KeyboardInterrupt:

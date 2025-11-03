@@ -6,10 +6,6 @@ services:
       dockerfile: Dockerfile
     environment:
       # Secrets Configuration (JSON format with field filtering)
-      # Replace with your actual secret IDs from Delinea PLatform/Secret-Server
-      # Note: You can give custom names to secrets below for easier reference
-      # Note: Field filtering is supported using comma-separated slug-field names or '*' for all fields
-      # 3 sample secrets provided below
       SECRETS_CONFIG: |
         [
           {
@@ -104,6 +100,10 @@ services:
         curl -f https://nginx-proxy:8443/secrets/mongo-secret || echo "❌ Mongo secret failed"
         echo ""
 
+        echo "🍃 Fetching mongo-secret by ID:"
+        curl -f https://nginx-proxy:8443/secrets/11126 || echo "❌ Mongo secret by ID failed"
+        echo ""
+
         echo ""
 
         echo "✅ Initial tests complete. Keeping container alive..."
@@ -152,7 +152,6 @@ services:
         node server.js"
     ports:
       - "3000:3000"
-    # App configuration via environment variables
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       DB_HOST: ${DB_HOST:-mongodb}

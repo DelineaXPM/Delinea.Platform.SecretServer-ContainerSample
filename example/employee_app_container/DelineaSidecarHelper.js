@@ -12,11 +12,10 @@ let cachedSecret = null;
 let cacheTime = 0;
 const CACHE_DURATION_MS = 60 * 1000; // 1 minute cache
 
-// Function to get secret from Delinea Sidecar with caching
-async function getSecretFromDelineaSidecar(secretName) {
+async function getSecretFromDelineaSidecar(secretNameOrID) {
   const now = Date.now();
   if (!cachedSecret || (now - cacheTime) > CACHE_DURATION_MS) {
-    const url = `https://nginx-proxy:8443/secrets/${encodeURIComponent(secretName)}`;
+    const url = `https://nginx-proxy:8443/secrets/${encodeURIComponent(secretNameOrID)}`;
     const resp = await axios.get(url, { httpsAgent });
     cachedSecret = resp.data;
     cacheTime = now;
