@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .status-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .status-section h2 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .status-card {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .status-card h4 {
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        
+        .status-card p {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-healthy { background-color: #48bb78; }
+        .status-warning { background-color: #ed8936; }
+        .status-error { background-color: #f56565; }
+        
+        .employees-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .employees-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .employee-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .employee-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+        
+        .employee-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+        
+        .employee-position {
+            color: #667eea;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+        
+        .employee-details {
+            font-size: 0.9rem;
+            color: #718096;
+        }
+        
+        .employee-details div {
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .employee-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 12px;
+            height: 12px;
+            background-color: #48bb78;
+            border-radius: 50%;
+        }
+        
+        .controls {
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #4fd1c7 0%, #06bbd3 100%);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+        
+        .error {
+            background-color: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .timestamp {
+            font-size: 0.8rem;
+            color: #a0aec0;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 Employee Management System</h1>
+            <p>Environment Variable Configuration Demo</p>
+        </div>
+        
+        <div class="status-section">
+            <h2>📊 System Status</h2>
+            <div class="status-grid">
+                <div class="status-card">
+                    <h4>Application Status</h4>
+                    <p id="appStatus">
+                        <span class="status-indicator status-healthy"></span>
+                        Loading...
+                    </p>
+                </div>
+                <div class="status-card">
+                    <h4>Database Connection</h4>
+                    <p id="dbStatus">
+                        <span class="status-indicator status-warning"></span>
+                        Checking...
+                    </p>
+                </div>
+                <div class="status-card">
+                    <h4>Environment</h4>
+                    <p id="environment">
+                        <span class="status-indicator status-healthy"></span>
+                        <span id="envName">Loading...</span>
+                    </p>
+                </div>
+                <div class="status-card">
+                    <h4>Configuration Source</h4>
+                    <p>
+                        <span class="status-indicator status-healthy"></span>
+                        Environment Variables
+                    </p>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn" onclick="loadEmployees()">🔄 Refresh Employees</button>
+                <button class="btn btn-secondary" onclick="checkHealth()">💚 Health Check</button>
+                <button class="btn btn-secondary" onclick="showConfig()">⚙️ Show Config</button>
+            </div>
+            
+            <div class="timestamp" id="lastUpdated"></div>
+        </div>
+        
+        <div class="employees-section">
+            <h2>👥 Employee Directory</h2>
+            <div id="employeesList" class="loading">Loading employees...</div>
+        </div>
+    </div>
+
+    <script>
+        let configData = {};
+        
+        // Load application config
+        async function loadConfig() {
+            try {
+                const response = await fetch('/api/config');
+                configData = await response.json();
+                
+                document.getElementById('envName').textContent = configData.environment;
+                document.title = configData.appName || 'Employee Management System';
+                
+                updateStatus();
+            } catch (error) {
+                console.error('Failed to load config:', error);
+            }
+        }
+        
+        // Load employees from API
+        async function loadEmployees() {
+            try {
+                document.getElementById('employeesList').innerHTML = '<div class="loading">Loading employees...</div>';
+                
+                const response = await fetch('/api/employees');
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayEmployees(result.data);
+                    updateTimestamp(result.timestamp);
+                } else {
+                    document.getElementById('employeesList').innerHTML = 
+                        `<div class="error">Failed to load employees: ${result.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('employeesList').innerHTML = 
+                    `<div class="error">Connection error: ${error.message}</div>`;
+                console.error('Error loading employees:', error);
+            }
+        }
+        
+        // Display employees in cards
+        function displayEmployees(employees) {
+            if (employees.length === 0) {
+                document.getElementById('employeesList').innerHTML = 
+                    '<div class="loading">No employees found</div>';
+                return;
+            }
+            const employeeGrid = employees.map(emp => `
+                <div class="employee-card">
+                    <div class="employee-status"></div>
+                    <div class="employee-name">${emp.name}</div>
+                    <div class="employee-position">${emp.position}</div>
+                    <div class="employee-details">
+                        <div><span>Department:</span> <span>${emp.department}</span></div>
+                        <div><span>Email:</span> <span>${emp.email}</span></div>
+                        <div><span>Start Date:</span> <span>${emp.startDate}</span></div>
+                        ${emp.salary ? `<div><span>Salary:</span> <span>$${emp.salary.toLocaleString()}</span></div>` : ''}
+                        <div><span>Status:</span> <span style="text-transform: capitalize;">${emp.status || 'active'}</span></div>
+                    </div>
+                    <a href="#" class="btn btn-secondary" style="text-decoration:underline;" onclick="showEditModal('${emp._id || emp.id}','${emp.name}','${emp.position}','${emp.department}','${emp.email}','${emp.startDate}','${emp.salary || ''}','${emp.status || 'active'}'); return false;">Edit</a>
+                </div>
+            `).join('');
+            document.getElementById('employeesList').innerHTML = 
+                `<div class="employees-grid">${employeeGrid}</div>`;
+            // Add modal if not present
+            if (!document.getElementById('editModal')) {
+                const modalHtml = `
+                <div id="editModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center;">
+                    <div style="background:#fff;padding:30px;border-radius:10px;max-width:400px;width:90%;position:relative;">
+                        <h3 style="margin-bottom:15px;">Edit Employee</h3>
+                        <form id="editForm">
+                            <input type="hidden" id="editId" />
+                            <div style="margin-bottom:10px;"><label>Name:</label><input type="text" id="editName" style="width:100%" required /></div>
+                            <div style="margin-bottom:10px;"><label>Position:</label><input type="text" id="editPosition" style="width:100%" required /></div>
+                            <div style="margin-bottom:10px;"><label>Department:</label><input type="text" id="editDepartment" style="width:100%" required /></div>
+                            <div style="margin-bottom:10px;"><label>Email:</label><input type="email" id="editEmail" style="width:100%" required /></div>
+                            <div style="margin-bottom:10px;"><label>Start Date:</label><input type="date" id="editStartDate" style="width:100%" required /></div>
+                            <div style="margin-bottom:10px;"><label>Salary:</label><input type="number" id="editSalary" style="width:100%" /></div>
+                            <div style="margin-bottom:10px;"><label>Status:</label><input type="text" id="editStatus" style="width:100%" /></div>
+                            <div style="text-align:right;">
+                                <button type="submit" class="btn">Save</button>
+                                <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>`;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                document.getElementById('editForm').onsubmit = submitEditForm;
+            }
+        }
+        
+        // Update status indicators
+        async function updateStatus() {
+            document.getElementById('appStatus').innerHTML = 
+                '<span class="status-indicator status-healthy"></span>Running';
+        }
+        
+        // Health check
+        async function checkHealth() {
+            try {
+                const response = await fetch('/api/health');
+                const health = await response.json();
+                
+                const dbIndicator = health.database === 'connected' ? 
+                    '<span class="status-indicator status-healthy"></span>Connected' :
+                    '<span class="status-indicator status-error"></span>Disconnected';
+                    
+                document.getElementById('dbStatus').innerHTML = dbIndicator;
+                
+                alert(`Health Status: ${health.status}\nDatabase: ${health.database}\nUptime: ${Math.floor(health.uptime)}s`);
+            } catch (error) {
+                document.getElementById('dbStatus').innerHTML = 
+                    '<span class="status-indicator status-error"></span>Error';
+                alert('Health check failed: ' + error.message);
+            }
+        }
+        
+        // Show configuration
+        async function showConfig() {
+            try {
+                const response = await fetch('/api/config');
+                const config = await response.json();
+                
+                const configText = `
+Application: ${config.appName}
+Environment: ${config.environment}
+Database Host: ${config.database.host}
+Database Port: ${config.database.port}
+Database Name: ${config.database.name}
+Database User: ${config.database.user}
+Database Connected: ${config.database.connected ? 'Yes' : 'No'}
+                `.trim();
+                
+                alert('Current Configuration:\n\n' + configText);
+            } catch (error) {
+                alert('Failed to load configuration: ' + error.message);
+            }
+        }
+        
+        // Update timestamp
+        function updateTimestamp(timestamp) {
+            if (timestamp) {
+                document.getElementById('lastUpdated').textContent = 
+                    `Last updated: ${new Date(timestamp).toLocaleString()}`;
+            }
+        }
+        
+        // Show edit modal
+        function showEditModal(id, name, position, department, email, startDate, salary, status) {
+            document.getElementById('editId').value = id;
+            document.getElementById('editName').value = name;
+            document.getElementById('editPosition').value = position;
+            document.getElementById('editDepartment').value = department;
+            document.getElementById('editEmail').value = email;
+            document.getElementById('editStartDate').value = startDate;
+            document.getElementById('editSalary').value = salary;
+            document.getElementById('editStatus').value = status;
+            document.getElementById('editModal').style.display = 'flex';
+        }
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+        async function submitEditForm(e) {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const updated = {
+                name: document.getElementById('editName').value,
+                position: document.getElementById('editPosition').value,
+                department: document.getElementById('editDepartment').value,
+                email: document.getElementById('editEmail').value,
+                startDate: document.getElementById('editStartDate').value,
+                salary: Number(document.getElementById('editSalary').value),
+                status: document.getElementById('editStatus').value
+            };
+            try {
+                const response = await fetch(`/api/employees/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updated)
+                });
+                const result = await response.json();
+                if (result.success) {
+                    closeEditModal();
+                    loadEmployees();
+                    alert('Employee updated successfully!');
+                } else {
+                    alert('Failed to update employee: ' + (result.error || 'Unknown error'));
+                }
+            } catch (err) {
+                alert('Error updating employee: ' + err.message);
+            }
+        }
+        
+        // Auto-load data when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadConfig();
+            loadEmployees();
+            checkHealth();
+            
+            // Auto-refresh every 30 seconds
+            setInterval(() => {
+                loadEmployees();
+                updateStatus();
+            }, 30000);
+        });
+    </script>
+</body>
+</html>
